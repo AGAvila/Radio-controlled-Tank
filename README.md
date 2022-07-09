@@ -51,3 +51,5 @@ The different body parts have been made using a 3D printer. The choosen material
 ### 3. Electric design
 
 In this image the electric connections can be consult:
+
+![Montaje Electrico](C:\Users\alvar\Desktop\a)
