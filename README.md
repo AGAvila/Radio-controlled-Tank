@@ -52,4 +52,4 @@ The different body parts have been made using a 3D printer. The choosen material
 
 In this image the electric connections can be consult:
 
-![Montaje Electrico](C:\Users\alvar\Desktop\a)
+![Montaje Electrico]()
