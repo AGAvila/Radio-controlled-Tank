@@ -1,6 +1,6 @@
 # Radio-controlled-Tank
 
-This repository includes the code and hardware design to create a small tank-type vehicle controlled using a **Raspberry Pi Pico** and comunicated by **Bluetooth 2.0**.
+This repository includes the code and hardware design to create a small tank-type vehicle controlled using a **Raspberry Pi Pico** and comunicated by **Bluetooth 2.0**. The code have been programmed in **MicroPython**.
 
 ## Authors
 
@@ -44,3 +44,10 @@ Hardware/electric components needed:
 - 9V battery: It is used to power the motors
 - Powerbank: It is used to power the Raspberri Pi Pico
 
+#### Vehicle's body parts
+
+The different body parts have been made using a 3D printer. The choosen material is PLA. In **4. References** a link can be found to the web where the needed files are.
+
+### 3. Electric design
+
+In this image the electric connections can be consult:
