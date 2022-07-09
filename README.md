@@ -37,10 +37,10 @@ The vehicle can be controlled using a tablet, smartphone or PC via Bluetooth con
 
 Hardware/electric components needed:
 
--Raspberry Pi Pico: It will control the vehicle
--HC-06: This module will allow to comunicate with the Raspberri Pi Pico via Bluetooth. The device use as remote must by connected to this module.
--L298N: It allow to suply power to the motors and control them.
--Motors (x2)
--9V battery: It is used to power the motors
--Powerbank: It is used to power the Raspberri Pi Pico
+- Raspberry Pi Pico: It will control the vehicle
+- HC-06: This module will allow to comunicate with the Raspberri Pi Pico via Bluetooth. The device use as remote must by connected to this module.
+- L298N: It allow to suply power to the motors and control them.
+- Motors (x2)
+- 9V battery: It is used to power the motors
+- Powerbank: It is used to power the Raspberri Pi Pico
 
