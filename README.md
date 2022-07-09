@@ -4,8 +4,8 @@ This repository includes the code and hardware design to create a small tank-typ
 
 ## Authors
 
-- Álvaro García Ávila
-- Juan del Pino Mena 
+- [Álvaro García Ávila](https://github.com/AGAvila)
+- [Juan del Pino Mena](https://github.com/dpmj) 
 
 ## Table of Contents
 This README containts the next documentantion:
