@@ -46,10 +46,13 @@ Hardware/electric components needed:
 
 #### Vehicle's body parts
 
-The different body parts have been made using a 3D printer. The choosen material is PLA. In **4. References** a link can be found to the web where the needed files are.
+The different body parts have been made using a 3D printer. The choosen material is PLA. In **[1]** a link can be found to the web where the needed files are.
 
 ### 3. Electric design
 
 In this image the electric connections can be consult:
 
 ![Montaje Electrico](https://raw.githubusercontent.com/AGAvila/Radio-controlled-Tank/main/Electric_Design.png)
+
+### 4. References
+[1] https://www.thingiverse.com/thing:972768
