@@ -1,74 +1,62 @@
-"""
-Programa que permite el control de un robot que recibe órdenes mediante comunicación Bluetooth
-
-Autores: Álvaro García Ávila y Juan del Pino Mena
-Fecha última modificación: 24/05/2022
-"""
-
-#Bibliotecas
 from machine import Pin, PWM, UART
 from funciones_motores import DCMotor
 
-#----------------------------------------------------------------------------------------------------------------
+order = '0'  # Order ID
+duty = 60  # PWM duty cycle - Range -> 0-100 (%)
+freq = 15000  # PWM frequency - Rango -> 0-19200000
 
-uart = UART(0,9600) #Configuración UART
+# UART config
+uart = UART(0, 9600)
 
-#Variables
-orden = '0'   #ID de la orden a ejecutar
-duty = 80     #Duty cycle PWM (80 %) - Rango -> 0-100
-freq = 15000  #Frecuencia PWM - Rango -> 0-19200000
+# Input/Output pins assignation
+motor_control_led = Pin(25, Pin.OUT)  # LED to check if one of the motors is on
+motor_1_forward = Pin(9, Pin.OUT)  # Controls the turn direction of the motors
+motor_1_backward = Pin(8, Pin.OUT)
+motor_2_forward = Pin(7, Pin.OUT)
+motor_2_backward = Pin(6, Pin.OUT)
 
-#Asignación entradas/salida
-led_interno = Pin(25, Pin.OUT) #Led que indica si algún motor está en funcionamiento
-motor_1_adelante = Pin(9, Pin.OUT)            #Control del sentido de giro de los motores
-motor_1_atras = Pin(8, Pin.OUT)
-motor_2_adelante = Pin(7, Pin.OUT) 
-motor_2_atras = Pin(6, Pin.OUT)
-
-#PWM para control de los motores
-enable1 = PWM(Pin(10)) #PWM motor 1
+# PWM for the control of the motor feeding
+enable1 = PWM(Pin(10))  # PWM motor 1
 enable1.freq(freq)
-enable2 = PWM(Pin(5))  #PWM motor 2
+enable2 = PWM(Pin(5))  # PWM motor 2
 enable2.freq(freq)
 
-#Inicializa la biblioteca para control de motores 
-dc_motor = DCMotor(motor_1_adelante, motor_1_atras, motor_2_adelante, motor_2_atras, enable1, enable2, 0, 65535)
+# Starting of methods for the control of the motors
+dc_motor = DCMotor(motor_1_forward, motor_1_backward, motor_2_forward, motor_2_backward, enable1, enable2,
+                   0, 65535)
 
-#----------------------------------------------------------------------------------------------------------------
+# Main loop
+while True:
 
-while True: #Bucle principal
-    
-    #Lectura de ordenes
     if uart.any() > 0:
-        orden = uart.readline()
-    
-        #Repertorio de ordenes
-        if "1" in orden: #Stop
-            led_interno.value(0)
+        order = uart.readline()
+        # Stop
+        if "1" in order:
+            motor_control_led.value(0)
             dc_motor.motor_apagado()
-            
-        elif "2" in orden: #Avance hacia adelante
-            led_interno.value(1)
+        # Forward advance
+        elif "2" in order:
+            motor_control_led.value(1)
             dc_motor.motor_adelante(duty)
-            
-        elif "3" in orden: #Avance hacia atrás
-            led_interno.value(1)
+        # Backward advance
+        elif "3" in order:
+            motor_control_led.value(1)
             dc_motor.motor_atras(duty)
-            
-        elif "4" in orden: #Giro a la izquierda
-            led_interno.value(1)
+        # Turn left
+        elif "4" in order:
+            motor_control_led.value(1)
             dc_motor.motor_apagado()
             dc_motor.motor_1_adelante(duty)
-            
-        elif "5" in orden: #Giro a la derecha
-            led_interno.value(1)
+        # Turn right
+        elif "5" in order:
+            motor_control_led.value(1)
             dc_motor.motor_apagado()
             dc_motor.motor_2_adelante(duty)
-            
-        elif "6" in orden: #Rotación sentido horario
-            led_interno.value(1)
+        # Rotation clockwise
+        elif "6" in order:
+            motor_control_led.value(1)
             dc_motor.motor_rotacion_horario(duty)
-
-        elif "7" in orden: #Rotación sentido antihorario
-            led_interno.value(1)
+        # Rotation anticlockwise
+        elif "7" in order:
+            motor_control_led.value(1)
             dc_motor.motor_rotacion_antihorario(duty)
