@@ -1,5 +1,5 @@
 from machine import Pin, PWM, UART
-from funciones_motores import DCMotor
+from motorsControl import DCMotor
 
 order = '0'  # Order ID
 duty = 60  # PWM duty cycle - Range -> 0-100 (%)
@@ -33,30 +33,30 @@ while True:
         # Stop
         if "1" in order:
             motor_control_led.value(0)
-            dc_motor.motor_apagado()
+            dc_motor.all_motors_off()
         # Forward advance
         elif "2" in order:
             motor_control_led.value(1)
-            dc_motor.motor_adelante(duty)
+            dc_motor.all_motors_forward(duty)
         # Backward advance
         elif "3" in order:
             motor_control_led.value(1)
-            dc_motor.motor_atras(duty)
+            dc_motor.motor_backward(duty)
         # Turn left
         elif "4" in order:
             motor_control_led.value(1)
-            dc_motor.motor_apagado()
-            dc_motor.motor_1_adelante(duty)
+            dc_motor.all_motors_off()
+            dc_motor.motor_1_forward(duty)
         # Turn right
         elif "5" in order:
             motor_control_led.value(1)
-            dc_motor.motor_apagado()
-            dc_motor.motor_2_adelante(duty)
+            dc_motor.all_motors_off()
+            dc_motor.motor_2_forward(duty)
         # Rotation clockwise
         elif "6" in order:
             motor_control_led.value(1)
-            dc_motor.motor_rotacion_horario(duty)
+            dc_motor.motor_rotation_clockwise(duty)
         # Rotation anticlockwise
         elif "7" in order:
             motor_control_led.value(1)
-            dc_motor.motor_rotacion_antihorario(duty)
+            dc_motor.motor_rotation_anticlockwise(duty)
