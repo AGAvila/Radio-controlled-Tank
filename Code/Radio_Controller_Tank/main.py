@@ -5,17 +5,20 @@ import dht
 
 def send_temp_and_humidity(timer):
     """
-    Read data of temperature and humidity from DHT22 and send them via Bluetooth.
+    Read data of temperature and humidity from DHT22 and sends it via Bluetooth.
 
     Returns:
     - None
     """
-    
-    sensor = dht.DHT22(Pin(22))
-    sensor.measure()
-    temperature = sensor.temperature()
-    humidity = sensor.humidity()
-    uart.write(f"Temp: {temperature} Cº, Humidity {humidity} %\n")
+    try:
+        sensor = dht.DHT22(Pin(22))
+        sensor.measure()
+        temperature = sensor.temperature()
+        humidity = sensor.humidity()
+        uart.write(f"Temp: {temperature} Cº, Humidity {humidity} %\n")
+    except:
+        uart.write("An error ocurred reading from DHT22\n")
+        print("An error ocurred reading from DHT22\n")
 
 
 order = "0"     # Order ID
