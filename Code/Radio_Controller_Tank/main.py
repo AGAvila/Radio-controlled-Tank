@@ -20,9 +20,12 @@ def send_temp_and_humidity(timer):
         uart.write(f"Temp: {temperature} Cº, Humidity {humidity} %\n")
     except:
         uart.write("An error ocurred reading from DHT22\n")
-        print("An error ocurred reading from DHT22\n")
+
 
 if __name__ == "__main__":
+    
+    ssid = ""  # Wifi net name
+    password = ""  # Wifi net password 
     
     order = "0"     # Order ID
     speed = 80      # Power transfer to the motors (Range -> 0-100) 
@@ -47,7 +50,10 @@ if __name__ == "__main__":
     # Starting of methods for the control of the motors
     dc_motor = DCMotor(speed, motor_1_forward, motor_1_backward, motor_2_forward, motor_2_backward, enable_1, enable_2,
                        0, 65535)
-
+    
+    # Connect to Wifi
+    wifiCom.connet_to_wifi(ssid, password)
+    
     # Internal LED initially OFF
     motor_control_led.value(0)
 

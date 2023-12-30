@@ -1,9 +1,10 @@
 import network
 import time
+import urequests
 
 class wifiCom:
     
-    def connet_to_wifi(self, ssid: str, password: str):
+    def connet_to_wifi(ssid: str, password: str):
         """
         Connect to a Wifi net
         
@@ -22,16 +23,16 @@ class wifiCom:
         max_wait = 10
         while max_wait > 0:
             if wlan.status() < 0 or wlan.status() >= 3:
-            break
+                break
         
         max_wait -= 1
-        print('waiting for connection...')
+        print('Waiting for connection...')
         time.sleep(1)
 
         # Handle connection error
         if wlan.status() != 3:
-            raise RuntimeError('network connection failed')
+            raise RuntimeError('Network connection failed')
         else:
-            print('connected')
+            print('Connected')
             status = wlan.ifconfig()
             print( 'ip = ' + status[0] )
