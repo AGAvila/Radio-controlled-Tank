@@ -1,5 +1,22 @@
-from machine import Pin, PWM, UART
+from machine import Pin, PWM, UART, Timer
 from motorsControl import DCMotor
+import dht
+  
+
+def send_temp_and_humidity(timer):
+    """
+    Read data of temperature and humidity from DHT22 and send them via Bluetooth.
+
+    Returns:
+    - None
+    """
+    
+    sensor = dht.DHT22(Pin(22))
+    sensor.measure()
+    temperature = sensor.temperature()
+    humidity = sensor.humidity()
+    uart.write(f"Temp: {temperature} Cº, Humidity {humidity} %\n")
+
 
 order = "0"     # Order ID
 speed = 80      # Range -> 0-100 (%)
@@ -16,22 +33,27 @@ motor_2_forward = Pin(7, Pin.OUT)
 motor_2_backward = Pin(6, Pin.OUT)
 
 # PWM for the control of the motor feeding
-enable1 = PWM(Pin(10))  # PWM motor 1
-enable1.freq(freq)
-enable2 = PWM(Pin(5))  # PWM motor 2
-enable2.freq(freq)
+enable_1 = PWM(Pin(10))  # PWM motor 1
+enable_1.freq(freq)
+enable_2 = PWM(Pin(5))  # PWM motor 2
+enable_2.freq(freq)
 
 # Starting of methods for the control of the motors
-dc_motor = DCMotor(speed, motor_1_forward, motor_1_backward, motor_2_forward, motor_2_backward, enable1, enable2,
+dc_motor = DCMotor(speed, motor_1_forward, motor_1_backward, motor_2_forward, motor_2_backward, enable_1, enable_2,
                    0, 65535)
 
+# Internal LED initially OFF
 motor_control_led.value(0)
+
+# Interruptions
+Timer(mode=Timer.PERIODIC, period=int(5e3), callback=send_temp_and_humidity)
+
 
 # Main loop
 while True:
 
     if uart.any() > 0:
-
+        # Read orders from the controller
         order = uart.readline()
 
         # Stop

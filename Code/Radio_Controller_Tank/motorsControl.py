@@ -1,5 +1,3 @@
-from machine import Pin
-
 class DCMotor:
 
     def __init__(self, speed, pin1, pin2, pin3, pin4, enable_pin1, enable_pin2, min_duty=0, max_duty=65535):
