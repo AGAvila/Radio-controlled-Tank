@@ -2,34 +2,60 @@ from machine import Pin, PWM, UART, Timer
 from motorsControl import DCMotor
 from wirelessCommunication import wifiCom
 import dht
-  
 
-def send_temp_and_humidity(timer):
+    
+def get_temp_and_humidity():
     """
-    Read data of temperature and humidity from DHT22 and sends it via Bluetooth.
+    Read data of temperature and humidity from DHT22.
+    
+    Inputs:
+    - None
+    Returns:
+    - None
+    """
+    
+    global temperature
+    global humidity
+    
+    try:
+        # Sensor communication pin
+        sensor = dht.DHT22(Pin(22))
+        # Get measures from sensor
+        sensor.measure()
+        temperature = sensor.temperature()
+        humidity = sensor.humidity()
+    except:
+        # If DHT22 measures cannot be read
+        temperature = "Error"
+        humidity = "Error"
 
+def send_temp_and_humidity_int(timer):
+    """
+    Interruption: Sends temperature and humidity read from DHT22 via Bluetooth and to Telegram.
+    
+    Inputs:
+    - None
     Returns:
     - None
     """
     
     try:
-        sensor = dht.DHT22(Pin(22))
-        sensor.measure()
-        temperature = sensor.temperature()
-        humidity = sensor.humidity()
+        get_temp_and_humidity()
         uart.write(f"Temp: {temperature} Cº, Humidity {humidity} %\n")
     except:
-        uart.write("An error ocurred reading from DHT22\n")
+        uart.write("An error ocurred reading from DHT22\n")        
 
 
 if __name__ == "__main__":
     
-    ssid = ""  # Wifi net name
-    password = ""  # Wifi net password 
-    
+    # Motors config
     order = "0"     # Order ID
     speed = 80      # Power transfer to the motors (Range -> 0-100) 
     freq = 15000    # PWM frequency (Range -> 0-19200000)
+    
+    # DHT22 sensors values
+    temperature = "0"
+    humidity = "0"
 
     # UART config
     uart = UART(0, 9600)
@@ -41,7 +67,7 @@ if __name__ == "__main__":
     motor_2_forward = Pin(7, Pin.OUT)
     motor_2_backward = Pin(6, Pin.OUT)
 
-    # PWM for the control of the motor feeding
+    # PWM for the control of the motors recieved power
     enable_1 = PWM(Pin(10))  # PWM motor 1
     enable_1.freq(freq)
     enable_2 = PWM(Pin(5))  # PWM motor 2
@@ -52,14 +78,17 @@ if __name__ == "__main__":
                        0, 65535)
     
     # Connect to Wifi
-    wifiCom.connet_to_wifi(ssid, password)
+    wifiCom.connet_to_wifi()
+    
+    # Send message to Telegram
+    message = "Testing"
+    wifiCom.send_telegram_message(message)
     
     # Internal LED initially OFF
     motor_control_led.value(0)
 
     # Interruptions
-    Timer(mode=Timer.PERIODIC, period=int(5e3), callback=send_temp_and_humidity)
-
+    Timer(mode=Timer.PERIODIC, period=int(5e3), callback=send_temp_and_humidity_int)
 
     # Main loop
     while True:
