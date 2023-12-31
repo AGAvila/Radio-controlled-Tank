@@ -10,8 +10,7 @@ class wifiCom:
         Connect to a Wifi net.
         
         Inputs:
-        - ssid: ID of the net
-        - password: Password of the net
+        - None
         Returns:
         - None
         """
@@ -43,8 +42,6 @@ class wifiCom:
         Sends a message to Telegram.
         
         Inputs:
-        - token: Bot token
-        - chat_id: Chat ID of the conversation with the bot
         - message: String to be sent by the Telegram bot to the user
         Returns:
         - True if there was no error or False the other case around
