@@ -1,10 +1,11 @@
 import network
 import time
 import urequests
+from private_information import ssid, password, bot_token, chat_id
 
 class wifiCom:
     
-    def connet_to_wifi(ssid: str, password: str):
+    def connet_to_wifi():
         """
         Connect to a Wifi net.
         
@@ -37,7 +38,7 @@ class wifiCom:
             status = wlan.ifconfig()
             print( 'ip = ' + status[0] )
     
-    def send_telegram_message(bot_token: str, chat_id: str, message: str):
+    def send_telegram_message(message: str):
         """
         Sends a message to Telegram.
         
