@@ -6,7 +6,7 @@ class wifiCom:
     
     def connet_to_wifi(ssid: str, password: str):
         """
-        Connect to a Wifi net
+        Connect to a Wifi net.
         
         Inputs:
         - ssid: ID of the net
@@ -36,3 +36,27 @@ class wifiCom:
             print('Connected')
             status = wlan.ifconfig()
             print( 'ip = ' + status[0] )
+    
+    def send_telegram_message(bot_token: str, chat_id: str, message: str):
+        """
+        Sends a message to Telegram.
+        
+        Inputs:
+        - token: Bot token
+        - chat_id: Chat ID of the conversation with the bot
+        - message: String to be sent by the Telegram bot to the user
+        Returns:
+        - True if there was no error or False the other case around
+        """
+        
+        send_URL = "https://api.telegram.org/bot" + bot_token
+        data = {'chat_id': chat_id, 'text': message}
+        
+        try:
+            headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+            response = urequests.post(send_URL + '/sendMessage', json=data, headers=headers)
+            response.close()
+            return True
+        except:
+            return False
+    
