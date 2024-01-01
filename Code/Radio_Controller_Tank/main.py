@@ -139,7 +139,6 @@ if __name__ == "__main__":
     wifiCom.connet_to_wifi()
     
     # Send message to Telegram
-    #wifiCom.send_telegram_message("Radio Robot Online")
     starting_message()
     
     # Internal LED initially OFF
