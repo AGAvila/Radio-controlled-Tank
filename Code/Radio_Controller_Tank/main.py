@@ -2,6 +2,7 @@ from machine import Pin, PWM, UART, Timer
 from motorsControl import DCMotor
 from wirelessCommunication import wifiCom
 import dht
+import time
 
     
 def get_temp_and_humidity():
@@ -27,23 +28,77 @@ def get_temp_and_humidity():
     except:
         # If DHT22 measures cannot be read
         temperature = "Error"
-        humidity = "Error"
+        humidity = "Error"        
 
-def send_temp_and_humidity_int(timer):
+def starting_message():
     """
-    Interruption: Sends temperature and humidity read from DHT22 via Bluetooth and to Telegram.
-    
-    Inputs:
-    - None
-    Returns:
-    - None
+    Welcome message notifying of the current set of instructions
     """
     
-    try:
+    inst_1 = "Current instruction set:\n/stop\n/go\n/back\n/left\n/right\n/clockwise\n/anticlockwise\n"
+    inst_2 = "/temperature\n/humidity\n"
+    instructions_set_message = inst_1 + inst_2
+    
+    wifiCom.send_telegram_message("Radio Robot Online")
+    wifiCom.send_telegram_message(instructions_set_message)
+
+def process_order(message: str):
+    """
+    Does and action depending on the message received from Telegram
+    """
+    
+    if "/stop" in message:
+        #uart.write("Stopping\n")
+        motor_control_led.value(0)
+        dc_motor.all_motors_off()
+        wifiCom.send_telegram_message("Stopping")
+    # Forward advance
+    elif "/go" in message:
+        #uart.write("Going forward\n")
+        motor_control_led.value(1)
+        dc_motor.all_motors_forward()
+        wifiCom.send_telegram_message("Going forward!")
+    # Backward advance
+    elif "/back" in message:
+        #uart.write("Going backward\n")
+        motor_control_led.value(1)
+        dc_motor.motor_backward()
+        wifiCom.send_telegram_message("Going backwards!")
+    # Turn left
+    elif "/left" in message:
+        #uart.write("To the left\n")
+        motor_control_led.value(1)
+        dc_motor.all_motors_off()
+        dc_motor.motor_1_forward()
+        wifiCom.send_telegram_message("Turning left")
+    # Turn right
+    elif "/right" in message:
+        #uart.write("To the right\n")
+        motor_control_led.value(1)
+        dc_motor.all_motors_off()
+        dc_motor.motor_2_forward()
+        wifiCom.send_telegram_message("Turning right")
+    # Rotation clockwise
+    elif "/clockwise" in message:
+        #uart.write("Clockwise\n")
+        motor_control_led.value(1)
+        dc_motor.motor_rotation_clockwise()
+        wifiCom.send_telegram_message("Rotating clockwise")
+    # Rotation anticlockwise
+    elif "/anticlockwise" in message:
+        #uart.write("Anticlockwise\n")
+        motor_control_led.value(1)
+        dc_motor.motor_rotation_anticlockwise()
+        wifiCom.send_telegram_message("Rotating anticlockwise")
+    elif "/temperature" in message:
         get_temp_and_humidity()
-        uart.write(f"Temp: {temperature} Cº, Humidity {humidity} %\n")
-    except:
-        uart.write("An error ocurred reading from DHT22\n")        
+        wifiCom.send_telegram_message(f"Temperature: {temperature} Cº")
+    elif "/humidity" in message:
+        get_temp_and_humidity()
+        wifiCom.send_telegram_message(f"Humidity: {humidity} %")
+    else:
+        print("I do not know what do you want from me\n")
+        wifiCom.send_telegram_message("I do not know what do you want from me")
 
 
 if __name__ == "__main__":
@@ -56,12 +111,15 @@ if __name__ == "__main__":
     # DHT22 sensors values
     temperature = "0"
     humidity = "0"
-
-    # UART config
-    uart = UART(0, 9600)
+    
+    # Set the initial offset to None
+    offset = None
+    
+    # UART config (legacy)
+    # uart = UART(0, 9600)
 
     # Input/Output pins assignation
-    motor_control_led = Pin(25, Pin.OUT)  # LED to check if one of the motors is on
+    motor_control_led = Pin(1, Pin.OUT)  # LED to check if one of the motors is on
     motor_1_forward = Pin(9, Pin.OUT)  # Controls the turn direction of the motors
     motor_1_backward = Pin(8, Pin.OUT)
     motor_2_forward = Pin(7, Pin.OUT)
@@ -81,56 +139,31 @@ if __name__ == "__main__":
     wifiCom.connet_to_wifi()
     
     # Send message to Telegram
-    message = "Testing"
-    wifiCom.send_telegram_message(message)
+    #wifiCom.send_telegram_message("Radio Robot Online")
+    starting_message()
     
     # Internal LED initially OFF
     motor_control_led.value(0)
 
-    # Interruptions
-    Timer(mode=Timer.PERIODIC, period=int(5e3), callback=send_temp_and_humidity_int)
-
     # Main loop
     while True:
+        
+        # Get updates from Telegram
+        try:
+            updates = wifiCom.get_telegram_updates(offset)
 
-        if uart.any() > 0:
-            # Read orders from the controller
-            order = uart.readline()
+            # Process received messages
+            for update in updates.get('result', []):
+                message = update.get('message', {}).get('text')
+                chat_id = update.get('message', {}).get('chat', {}).get('id')
 
-            # Stop
-            if "1" in order:
-                uart.write("Stopping\n")
-                motor_control_led.value(0)
-                dc_motor.all_motors_off()
-            # Forward advance
-            elif "2" in order:
-                uart.write("Going forward\n")
-                motor_control_led.value(1)
-                dc_motor.all_motors_forward()
-            # Backward advance
-            elif "3" in order:
-                uart.write("Going backward\n")
-                motor_control_led.value(1)
-                dc_motor.motor_backward()
-            # Turn left
-            elif "4" in order:
-                uart.write("To the left\n")
-                motor_control_led.value(1)
-                dc_motor.all_motors_off()
-                dc_motor.motor_1_forward()
-            # Turn right
-            elif "5" in order:
-                uart.write("To the right\n")
-                motor_control_led.value(1)
-                dc_motor.all_motors_off()
-                dc_motor.motor_2_forward()
-            # Rotation clockwise
-            elif "6" in order:
-                uart.write("Clockwise\n")
-                motor_control_led.value(1)
-                dc_motor.motor_rotation_clockwise()
-            # Rotation anticlockwise
-            elif "7" in order:
-                uart.write("Anticlockwise\n")
-                motor_control_led.value(1)
-                dc_motor.motor_rotation_anticlockwise()
+                if message and chat_id:
+                    print(f"Received message '{message}' from chat ID {chat_id}\n")
+                    process_order(message)
+
+                # Update the offset to the latest update ID + 1
+                offset = update['update_id'] + 1
+
+        except Exception as e:
+            print('Error:', e)
+            time.sleep(10)
