@@ -3,6 +3,8 @@ import time
 import urequests
 from private_information import ssid, password, bot_token, chat_id
 
+offset_id = 0
+
 class wifiCom:
     
     def connet_to_wifi():
@@ -58,3 +60,23 @@ class wifiCom:
         except:
             return False
     
+    def get_telegram_updates(offset=None):
+        """
+        Get the last message from the Telegram conversation with the bot.
+        
+        Inputs:
+        - offset: Number of the message to get from the conversation
+        Return:
+        - Indicated message in JSON format or False case a error happends in the process
+        """
+        
+        get_url = 'https://api.telegram.org/bot' + bot_token + '/getUpdates'
+        
+        if offset is not None:
+            url += f'?offset={offset}'
+        
+        try:
+            response = urequests.get(get_url)
+            return response.json()
+        except:
+            return False
