@@ -73,7 +73,7 @@ class wifiCom:
         get_url = 'https://api.telegram.org/bot' + bot_token + '/getUpdates'
         
         if offset is not None:
-            url += f'?offset={offset}'
+            get_url += f'?offset={offset}'
         
         try:
             response = urequests.get(get_url)
