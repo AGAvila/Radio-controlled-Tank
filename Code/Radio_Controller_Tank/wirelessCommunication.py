@@ -1,7 +1,8 @@
 import network
 import time
 import urequests
-from private_information import ssid, password, bot_token, chat_id
+from private_information import *
+from umqtt.simple import MQTTClient
 
 offset_id = 0
 
@@ -79,4 +80,84 @@ class wifiCom:
             response = urequests.get(get_url)
             return response.json()
         except:
-            return False
+            return None
+    
+    def callback(topic, msg):
+        """
+        Handles received messages from MQTT server. When a message is publish in a topic,
+        the message stablish by this method will be printed
+        
+        Inputs:
+        - topic: Topic to subscribe to
+        - msg: Message to print
+        Return:
+        - None
+        """
+        
+        print("Mensaje recibido en el topic {}: {}".format(topic, msg))
+    
+    def MQTT_broker_connect():
+        """
+        Connects to MQTT broker
+        
+        Inputs:
+        - None
+        Return:
+        - Instance of a client connected to MQTT broker
+        """
+        
+        try:
+            # Instance of the MQTT client
+            mqtt_client = MQTTClient(
+                client_id=b"RaspberryPiPico",
+                server=MQTT_server_hostname,
+                user=MQTT_client_ID,
+                password=MQTT_client_password,
+                port=0,
+                keepalive=7200,
+                ssl=True,
+                ssl_params={'server_hostname': MQTT_server_hostname})
+            # Connect to MQTT broker
+            mqtt_client.connect()
+            print("Connected to MQTT broker")
+            return mqtt_client
+        
+        except OSError as e:
+            print("Error connecting to MQTT broker:", e)
+            return None
+        
+    def MQTT_subscribe(mqtt_client, MQTT_topic: str):
+        """
+        Subscribe to MQTT topic
+        
+        Inputs:
+        - mqtt_client: Instance of a client connected to MQTT broker
+        - topic: Topic to subscribe to
+        Returns:
+        - None
+        """
+        
+        # Subscribe to topic
+        try:
+            mqtt_client.subscribe(MQTT_topic)
+        except Exception as e:
+            print('Error subscribing:', e)
+    
+    def MQTT_publish(mqtt_client: str, topic: str, message: str):
+        """
+        Publish in a MQTT topic
+        
+        Inputs:
+        - mqtt_client: Instance of a client connected to MQTT broker
+        - topic: Topic to subscribe to
+        - message: Message to be publish in the topic
+        Returns:
+        - None
+        """
+        
+        try:
+            mqtt_client.publish(topic, message)
+            print("Publish Done")
+        except Exception as e:
+            print('Error publishing:', e)
+    

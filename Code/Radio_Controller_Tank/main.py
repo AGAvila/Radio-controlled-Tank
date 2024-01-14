@@ -3,7 +3,7 @@ from motorsControl import DCMotor
 from wirelessCommunication import wifiCom
 import dht
 import time
-
+from private_information import *
     
 def get_temp_and_humidity():
     """
@@ -112,14 +112,18 @@ if __name__ == "__main__":
     temperature = "0"
     humidity = "0"
     
-    # Set the initial offset to None
+    # Set the initial Telegram offset to None
     offset = None
+    
+    # MQTT info
+    topic = "RadioTank"
+    message_to_publish = "RadioTank Online"
     
     # UART config (legacy)
     # uart = UART(0, 9600)
 
     # Input/Output pins assignation
-    motor_control_led = Pin(1, Pin.OUT)  # LED to check if one of the motors is on
+    motor_control_led = Pin(0, Pin.OUT)  # LED to check if one of the motors is on
     motor_1_forward = Pin(9, Pin.OUT)  # Controls the turn direction of the motors
     motor_1_backward = Pin(8, Pin.OUT)
     motor_2_forward = Pin(7, Pin.OUT)
@@ -138,12 +142,20 @@ if __name__ == "__main__":
     # Connect to Wifi
     wifiCom.connet_to_wifi()
     
-    # Send message to Telegram
+    # Send startind message to Telegram
     starting_message()
     
     # Internal LED initially OFF
     motor_control_led.value(0)
 
+    # Connect to MQTT broker
+    mqtt_client = wifiCom.MQTT_broker_connect()
+    mqtt_client.set_callback(wifiCom.callback)
+    
+    # Subscribe to MQTT topic
+    wifiCom.MQTT_subscribe(mqtt_client, topic)
+    wifiCom.MQTT_publish(mqtt_client, topic, message_to_publish)
+    
     # Main loop
     while True:
         
@@ -164,5 +176,12 @@ if __name__ == "__main__":
                 offset = update['update_id'] + 1
 
         except Exception as e:
-            print('Error:', e)
-            time.sleep(10)
+            print('Telegram Error:', e)
+            
+        # Get MQTT messages
+        try:
+            mqtt_client.check_msg();
+        except Exception as e:
+            mqtt_client.disconnect()
+            print('MQTT Error:', e)
+            
