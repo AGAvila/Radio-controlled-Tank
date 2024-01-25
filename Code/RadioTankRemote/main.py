@@ -19,7 +19,7 @@ class RemoteControllerApp:
         mqtt_publish(self.client, self.topic, self.start_message)
 
         # Creation of the buttons
-        for i in range(1, 8):
+        for i in range(1, 7):
             # Up button
             if i == 1:
                 btn_text = '\u02C4'  # Unicode Code
@@ -41,11 +41,8 @@ class RemoteControllerApp:
                 btn_text = "Stop"
                 row_num, col_num = self.get_coordinates(i)
             # Sensor button
-            elif i == 6:
-                btn_text = "Sensor"
-                row_num, col_num = self.get_coordinates(i)
             else:
-                btn_text = "Update"
+                btn_text = "Sensor"
                 row_num, col_num = self.get_coordinates(i)
 
             btn = tk.Button(window, text=btn_text, command=lambda num=i: self.used_button(num),
@@ -71,10 +68,8 @@ class RemoteControllerApp:
         elif index == 5:
             return 0, 7
         # Sensor button
-        elif index == 6:
+        else:
             return 0, 8
-        elif index == 7:
-            return 1, 8
 
     def used_button(self, num):
         """
