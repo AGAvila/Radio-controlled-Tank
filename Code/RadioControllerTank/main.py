@@ -180,6 +180,9 @@ if __name__ == "__main__":
     topic = "RadioTank"
     message_to_publish = "RadioTank Online"
     
+    # Ultrasound sensor
+    distance = 0
+    
     # UART config (legacy)
     # uart = UART(0, 9600)
     
@@ -226,6 +229,10 @@ if __name__ == "__main__":
     # Main loop
     while True:
         
+        # Check ultrasound sensor
+        distance = measure_distance()
+        print(distance)
+        
         # Get updates from Telegram
         try:
             updates = get_telegram_updates(offset)
@@ -249,7 +256,14 @@ if __name__ == "__main__":
         try:
             mqtt_client.check_msg()
             order = get_mqtt_message()
-            order = order[0]
+            
+            # If it the chasis is far from an obstacle
+            if distance > 30:
+                order = order[0]
+            # If the chasis is close to an obstacle
+            else:
+                order = "/stop"
+                
             process_order_mqtt(order, mqtt_client, topic)
             
             #process_order_telegram_mqtt(read_mqtt_message)
