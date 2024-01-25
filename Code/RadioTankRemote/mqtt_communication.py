@@ -73,5 +73,5 @@ def on_message(client, userdata, msg):
 
     """
 
-    print(f"Mensaje recibido en el tema '{msg.topic}': {msg.payload.decode()}")
+    print(f"Message received in the topic '{msg.topic}': {msg.payload.decode()}")
     return msg.payload.decode()
