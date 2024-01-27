@@ -4,32 +4,20 @@ from wirelessCommunication import *
 import dht
 import time
 from private_information import *
-from ultrasound_sensor import *
-    
-def get_temp_and_humidity():
+from sensors_control import *       
+
+
+def interruption_handler(timer):
     """
-    Read data of temperature and humidity from DHT22.
-    
-    Inputs:
-    - None
-    Returns:
-    - None
+    Time interruption handler. Sends via  MQTT the data acquiered by the DHT22.
     """
-    
-    global temperature
-    global humidity
     
     try:
-        # Sensor communication pin
-        sensor = dht.DHT22(Pin(22))
-        # Get measures from sensor
-        sensor.measure()
-        temperature = sensor.temperature()
-        humidity = sensor.humidity()
+        temperature, humidity = get_temp_and_humidity()
+        MQTT_publish(mqtt_client, topic, f"Temperature: {temperature} C, Humidity: {humidity}")
     except:
-        # If DHT22 measures cannot be read
-        temperature = "Error"
-        humidity = "Error"        
+        print("Could not read DHT22 sensor")
+
 
 def starting_message_telegram():
     """
@@ -42,6 +30,7 @@ def starting_message_telegram():
     
     send_telegram_message("Radio Robot Online")
     send_telegram_message(instructions_set_message)
+
 
 def process_order_telegram(message: str):
     """
@@ -94,10 +83,10 @@ def process_order_telegram(message: str):
         dc_motor.motor_rotation_anticlockwise()
         send_telegram_message("Rotating anticlockwise")
     elif "/temperature" in message:
-        get_temp_and_humidity()
+        temperature, humidity = get_temp_and_humidity()
         send_telegram_message(f"Temperature: {temperature} Cº")
     elif "/humidity" in message:
-        get_temp_and_humidity()
+        temperature, humidity = get_temp_and_humidity()
         send_telegram_message(f"Humidity: {humidity} %")
     else:
         print("I do not know what do you want from me\n")
@@ -146,7 +135,6 @@ def process_order_mqtt(message: str, client, topic):
         # MQTT_publish(client, topic, "Rotating clockwise")
     # Rotation anticlockwise
     elif "/anticlockwise" in message:
-        #uart.write("Anticlockwise\n")
         motor_control_led.value(1)
         dc_motor.motor_rotation_anticlockwise()
         MQTT_publish(client, topic, "Rotating anticlockwise")
@@ -164,9 +152,9 @@ def process_order_mqtt(message: str, client, topic):
     
 if __name__ == "__main__":
     
-    # Motors config
+    # Motors configuration
     order = "0"     # Order ID
-    speed = 80      # Power transfer to the motors (Range -> 0-100) 
+    speed = 80      # Power transfer to the motors (Range -> 70-100) 
     freq = 15000    # PWM frequency (Range -> 0-19200000)
     
     # DHT22 sensors values
@@ -220,11 +208,9 @@ if __name__ == "__main__":
     MQTT_subscribe(mqtt_client, topic)
     MQTT_publish(mqtt_client, topic, message_to_publish)
     
-     # Configure Timer interrupts
-    #timer_1 = Timer()
-    #timer_1.init(freq=1, mode=Timer.PERIODIC, callback=measure_distance)
-    #timer_2 = Timer()
-    # timer_2.init(freq=1.5, mode=Timer.PERIODIC, callback=measure_distance)
+    # Configure Timer interrupts
+    period = 10000  # 10 seconds
+    soft_timer = Timer(mode=Timer.PERIODIC, period=period, callback=interruption_handler)
     
     # Main loop
     while True:
