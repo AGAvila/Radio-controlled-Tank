@@ -114,7 +114,7 @@ if __name__ == "__main__":
     # Main window
     remote_window = tk.Tk()
     mando = RemoteControllerApp(remote_window, topic, start_message)
-    remote_window.after(1000, )
+    # remote_window.after(1000, )
 
     # Main loop of the app
     remote_window.mainloop()
