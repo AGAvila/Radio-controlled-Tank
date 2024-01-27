@@ -1,7 +1,39 @@
-"""Methods to control the HC-SR04 ultrasonic sensor"""
+"""Methods to control of the sensors"""
 
 from machine import Pin, time_pulse_us
 import time, utime
+import dht
+
+def get_temp_and_humidity():
+    """
+    Read data of temperature and humidity from DHT22.
+    
+    Inputs:
+    - None
+    Returns:
+    - Temperature read by the sensor
+    - Humidity read by the sensor
+    """
+    
+    # temperature = 0
+    # humidity = 0
+    
+    try:
+        # Sensor communication pin
+        sensor = dht.DHT22(Pin(22))
+        # Get measures from sensor
+        sensor.measure()
+        temperature = sensor.temperature()
+        humidity = sensor.humidity()
+        
+        return str(temperature), str(humidity)
+        
+    except:
+        # If DHT22 measures cannot be read
+        print("Error reading DHT22")
+        return None
+        
+
 
 def measure_distance():
     """
@@ -10,8 +42,8 @@ def measure_distance():
     
     
     # Ultrasound pins
-    trigger_pin = Pin(15, Pin.OUT) # Broche GP15 de la Pico
-    echo_pin = Pin(14, Pin.IN)  # Broche GP14 de la Pico
+    trigger_pin = Pin(15, Pin.OUT)
+    echo_pin = Pin(14, Pin.IN)
     
     # Trigger pulse
     trigger_pin.value(0)
