@@ -1,8 +1,8 @@
 # Radio-controlled-Tank
 
-This repository includes the code and hardware design to create a small tank-type vehicle controlled using a **Raspberry Pi Pico** via Wifi comunication, either using Telegram or MQTT. The code is written on **MicroPython**.
-If the device is controlled via Telegram, a chat generated with BotFather is used. In it, instructions can be sent and feedback from the device can be received.
-If MQTT is used for control, an application is provided, also in Python, which implements a command. The HiveMQ service is also used for this case.
+This repository contains the code and hardware design for creating a small tank-like vehicle controlled via Wi-Fi using a **Raspberry Pi Pico**. The control can be done through either Telegram or MQTT. The code is written in MicroPython. 
+If the vehicle is controlled through Telegram, a chat created with BotFather is used, where commands can be sent, and feedback from the device is received. If MQTT is used for control, a Python application is provided, which implements the 
+necessary commands. For this case, the HiveMQ service is also utilized.
  
 ## Table of Contents
 This README containts the following documentantion:
